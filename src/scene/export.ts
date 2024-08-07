@@ -1,18 +1,5 @@
 import rough from "roughjs/bin/rough";
-import {
-  ExcalidrawElement,
-  ExcalidrawFrameElement,
-  ExcalidrawTextElement,
-  NonDeletedExcalidrawElement,
-} from "../element/types";
-import {
-  Bounds,
-  getCommonBounds,
-  getElementAbsoluteCoords,
-} from "../element/bounds";
-import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
-import { cloneJSON, distance, getFontString } from "../utils";
-import { AppState, BinaryFiles } from "../types";
+import { getDefaultAppState } from "../appState";
 import {
   DEFAULT_EXPORT_PADDING,
   FONT_FAMILY,
@@ -20,17 +7,30 @@ import {
   SVG_NS,
   THEME_FILTER,
 } from "../constants";
-import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
+import { isFrameElement, newTextElement } from "../element";
+import {
+  Bounds,
+  getCommonBounds,
+  getElementAbsoluteCoords,
+} from "../element/bounds";
 import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
-import { elementsOverlappingBBox } from "../packages/withinBounds";
-import { getFrameElements, getRootElements } from "../frame";
-import { isFrameElement, newTextElement } from "../element";
-import { Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
+import {
+  ExcalidrawElement,
+  ExcalidrawFrameElement,
+  ExcalidrawTextElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
+import { getFrameElements, getRootElements } from "../frame";
+import { elementsOverlappingBBox } from "../packages/withinBounds";
+import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
+import { AppState, BinaryFiles } from "../types";
+import { Mutable } from "../utility-types";
+import { cloneJSON, distance, getFontString } from "../utils";
 import Scene from "./Scene";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
@@ -345,11 +345,7 @@ export const exportToSvg = async (
   let assetPath = "https://excalidraw.com/";
   // Asset path needs to be determined only when using package
   if (import.meta.env.VITE_IS_EXCALIDRAW_NPM_PACKAGE) {
-    assetPath =
-      window.EXCALIDRAW_ASSET_PATH ||
-      `https://unpkg.com/${import.meta.env.VITE_PKG_NAME}@${
-        import.meta.env.PKG_VERSION
-      }`;
+    assetPath = "/";
 
     if (assetPath?.startsWith("/")) {
       assetPath = assetPath.replace("/", `${window.location.origin}/`);
